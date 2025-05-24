@@ -1,0 +1,11 @@
+# Task ID: 4
+# Title: Build Response Normalization and Serialization Logic
+# Status: pending
+# Dependencies: 1, 2, 3
+# Priority: high
+# Description: Normalize and serialize API responses into Python dictionaries and JSON.
+# Details:
+Create normalizer.py to convert API responses (dataclass, dict, JSON) into Python dictionaries. Implement serialization to JSON. Handle edge cases for different response formats.
+
+# Test Strategy:
+Unit tests for normalization and serialization of various response types. Verify output is consistent and valid JSON.

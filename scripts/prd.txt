@@ -1,0 +1,89 @@
+<context>
+# Overview
+The API-to-MCP Transformation Tool converts any API (Python or otherwise) into a format compatible with the MCP (Modular Command Platform) system. It automates integration by inferring data structures and required fields from API usage and responses, supporting a wide range of response formats, and outputting standardized JSON and Python classes for MCP. The tool is for developers and integrators who need to quickly adapt third-party APIs for MCP.
+
+# Task List
+- Set up the project structure and create a CLI entry point (e.g., main.py)
+- Implement an input parser for API descriptions and usage code (input_parser.py)
+- Develop a sandboxed execution environment for API calls (sandbox.py)
+- Build response normalization and serialization logic (normalizer.py)
+- Create a field mapping engine with configurable/inferable mapping (field_mapper.py)
+- Implement MCP field validation logic (validator.py)
+- Develop an output generator for MCP-compatible JSON (output_generator.py)
+- Design and implement a base APIClient class (apiclient.py) with methods: execute, get_schema
+- Design and implement a base MCPTool class (mcp_tool.py) with methods: run, validate, and required class attributes (name, description, parameters_schema)
+- Generate a folder (e.g., generated_tools/) containing self-contained, standardized Python tool classes for each API, inheriting from MCPTool
+- Write an example tool class (WeatherTool) in generated_tools/ that inherits from MCPTool and implements the required interface
+- Add optional Python wrapper generation for the API transformation
+- Add extensibility hooks for new API types/response formats
+- Write documentation and usage examples (README.md)
+- Test all core features and flows with unit and integration tests (tests/)
+
+
+# Acceptance Criteria
+- Each task results in a concrete, testable deliverable (file, class, or folder)
+- The generated_tools/ folder contains at least one working example tool class (WeatherTool) inheriting from MCPTool
+- All abstractions (APIClient, MCPTool) are implemented as Python base classes and used by generated tools
+- The CLI can run end-to-end: from API description input to generation of MCP-compatible tool classes and JSON
+- Documentation and tests are present and verifiable
+
+# Core Features
+- Implement a command-line interface (CLI) for user interaction
+- Parse API descriptions and example usage code provided by the user
+- Execute API calls in a secure, sandboxed environment
+- Capture and normalize API responses (dataclass, dict, JSON) into Python dictionaries
+- Serialize normalized responses into JSON
+- Map API response fields to required MCP fields (configurable/inferable mapping)
+- Validate that all required MCP fields are present in the output
+- Output MCP-compatible JSON files
+- Generate a folder containing standardized, self-contained Python class definitions for each tool, following a base abstraction (e.g., MCPTool)
+- Implement base Python abstractions for API clients (APIClient) and MCP tools (MCPTool) to ensure extensibility and standardization
+- Optionally generate a Python wrapper module for the API transformation
+- Support extensibility for additional API types and response formats
+
+# User Experience
+- CLI prompts for API description, usage code, and mapping configuration
+- Clear error messages and usage documentation
+- Option for interactive mapping configuration
+- After execution, user receives a folder with ready-to-use, standardized Python tool classes
+
+# Technical Architecture
+- Input parser for API descriptions and usage examples
+- Sandboxed execution environment for safe API calls
+- Response normalizer and serializer
+- Field mapping engine (configurable/inferable)
+- Output generator for JSON and Python modules
+- Base abstractions:
+  - `APIClient` (abstract base class for all API integrations)
+  - `MCPTool` (abstract base class for all MCP tool definitions)
+
+# Development Roadmap
+- [ ] Set up project structure and CLI entry point
+- [ ] Implement input parser for API descriptions and usage code
+- [ ] Develop sandboxed execution environment for API calls
+- [ ] Build response normalization and serialization logic
+- [ ] Create field mapping engine (with config/inference)
+- [ ] Implement MCP field validation logic
+- [ ] Develop output generator for MCP-compatible JSON
+- [ ] Design and implement APIClient base class
+- [ ] Design and implement MCPTool base class
+- [ ] Generate a folder with self-contained, standardized Python tool classes for each API, inheriting from MCPTool
+- [ ] Add optional Python wrapper generation
+- [ ] Add extensibility hooks for new API types/response formats
+- [ ] Write documentation and usage examples
+- [ ] Test all core features and flows
+
+# Logical Dependency Chain
+- Project structure and CLI must be set up first
+- Input parser and sandboxed execution are foundational
+- Response normalization depends on successful API execution
+- Field mapping and validation require normalized responses
+- Output generation depends on field mapping and validation
+- Base abstractions must be defined before generating concrete tool classes
+- Extensibility and wrapper generation are layered after core features
+
+# Risks and Mitigations
+- Sandboxing and safe execution: Use proven libraries and restrict environment
+- MVP scope: Focus on Python APIs and basic mapping for first version
+- Performance/portability: Optimize for typical API response sizes and support major platforms
+</context>

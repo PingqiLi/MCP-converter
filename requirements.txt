@@ -1,0 +1,6 @@
+fast-flights==2.2
+primp==0.15.0
+protobuf==6.31.0
+PyYAML==6.0.2
+selectolax==0.3.29
+typing_extensions==4.13.2

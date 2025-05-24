@@ -1,0 +1,11 @@
+# Task ID: 15
+# Title: Test All Core Features and Flows
+# Status: pending
+# Dependencies: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
+# Priority: high
+# Description: Perform unit and integration testing of all core features.
+# Details:
+Write and execute unit and integration tests for all modules and workflows. Test end-to-end CLI execution from input to output generation.
+
+# Test Strategy:
+Run all unit and integration tests. Verify end-to-end workflow and CLI output.

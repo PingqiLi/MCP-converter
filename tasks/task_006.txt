@@ -1,0 +1,11 @@
+# Task ID: 6
+# Title: Implement MCP Field Validation Logic
+# Status: pending
+# Dependencies: 1, 2, 3, 4, 5
+# Priority: high
+# Description: Validate that all required MCP fields are present in the output.
+# Details:
+Create validator.py to check that mapped responses contain all required MCP fields. Provide clear error messages for missing or invalid fields.
+
+# Test Strategy:
+Unit tests for validation logic. Test with valid and invalid mapped responses.
