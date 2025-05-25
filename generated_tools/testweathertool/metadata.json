@@ -1,0 +1,77 @@
+{
+  "name": "TestWeatherTool",
+  "description": "Tool for getting weather information",
+  "version": "1.0.0",
+  "api_source": "scripts/real_weather_description.txt",
+  "usage_source": "scripts/real_weather_usage.py",
+  "generated_at": "2025-05-25T01:34:18.145614",
+  "files": {
+    "tool": "tool.py",
+    "wrapper": "wrapper.py",
+    "metadata": "metadata.json"
+  },
+  "mcp_schema": {
+    "input_schema": {
+      "city": {
+        "type": "string",
+        "description": "city parameter"
+      },
+      "api_key": {
+        "type": "string",
+        "description": "api_key parameter"
+      },
+      "units": {
+        "type": "string",
+        "description": "units parameter"
+      }
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "sys": {
+          "type": "object",
+          "properties": {
+            "country": {
+              "type": "string"
+            }
+          }
+        },
+        "main": {
+          "type": "object",
+          "properties": {
+            "temp": {
+              "type": "number"
+            },
+            "humidity": {
+              "type": "integer"
+            }
+          }
+        },
+        "weather": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "wind": {
+          "type": "object",
+          "properties": {
+            "speed": {
+              "type": "number"
+            }
+          }
+        }
+      }
+    },
+    "field_mapping": {
+      "name": "name",
+      "sys": "sys",
+      "main": "main",
+      "weather": "weather",
+      "wind": "wind"
+    }
+  }
+}

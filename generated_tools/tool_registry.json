@@ -1,0 +1,12 @@
+{
+  "tools": {},
+  "last_updated": null,
+  "version": "0.3.0",
+  "description": "Central registry for generated MCP tools",
+  "schema_version": "1.0",
+  "metadata": {
+    "total_tools": 0,
+    "creation_date": "2024-01-01T00:00:00Z",
+    "last_cleanup": "2024-01-01T00:00:00Z"
+  }
+}

@@ -9,9 +9,71 @@ class FieldMapper:
     def __init__(self, mapping: Optional[Dict[str, str]] = None):
         self.mapping = mapping or {}
 
-    def map_fields(self, data: Dict[str, Any], infer: bool = True, mcp_fields: Optional[list] = None) -> Dict[str, Any]:
+    def map_fields(self, normalized_response: Dict[str, Any], parsed_data: Dict[str, Any]) -> Dict[str, Any]:
         """
-        Map fields in data to MCP fields using config or inference.
+        Map API response fields to MCP schema format
+        
+        Args:
+            normalized_response: The normalized API response
+            parsed_data: Parsed data from input parser
+            
+        Returns:
+            Dict containing MCP-compatible mapping
+        """
+        # Create MCP-compatible mapping
+        mcp_mapping = {
+            "input_schema": parsed_data.get("parameters", {}),
+            "output_schema": self._create_output_schema(normalized_response),
+            "field_mapping": self._create_field_mapping(normalized_response)
+        }
+        
+        return mcp_mapping
+    
+    def _create_output_schema(self, response: Dict[str, Any]) -> Dict[str, Any]:
+        """Create output schema from API response"""
+        schema = {
+            "type": "object",
+            "properties": {}
+        }
+        
+        for key, value in response.items():
+            schema["properties"][key] = self._infer_json_schema_type(value)
+        
+        return schema
+    
+    def _create_field_mapping(self, response: Dict[str, Any]) -> Dict[str, str]:
+        """Create field mapping for API response"""
+        mapping = {}
+        
+        # Create direct mappings for now
+        for key in response.keys():
+            mapping[key] = key
+        
+        return mapping
+    
+    def _infer_json_schema_type(self, value: Any) -> Dict[str, Any]:
+        """Infer JSON schema type from a value"""
+        if isinstance(value, str):
+            return {"type": "string"}
+        elif isinstance(value, int):
+            return {"type": "integer"}
+        elif isinstance(value, float):
+            return {"type": "number"}
+        elif isinstance(value, bool):
+            return {"type": "boolean"}
+        elif isinstance(value, list):
+            return {"type": "array", "items": {"type": "object"} if value and isinstance(value[0], dict) else {"type": "string"}}
+        elif isinstance(value, dict):
+            properties = {}
+            for k, v in value.items():
+                properties[k] = self._infer_json_schema_type(v)
+            return {"type": "object", "properties": properties}
+        else:
+            return {"type": "string"}
+
+    def map_fields_legacy(self, data: Dict[str, Any], infer: bool = True, mcp_fields: Optional[list] = None) -> Dict[str, Any]:
+        """
+        Legacy method: Map fields in data to MCP fields using config or inference.
         If infer is True, try to match fields by name similarity if not in mapping.
         mcp_fields: list of required MCP field names (for inference).
         """

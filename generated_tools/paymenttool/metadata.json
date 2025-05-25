@@ -1,0 +1,60 @@
+{
+  "name": "PaymentTool",
+  "description": "Tool for payment processing",
+  "version": "1.0.0",
+  "api_info": {
+    "api_name": "Payment API",
+    "base_url": null,
+    "authentication": null,
+    "response_format": null
+  },
+  "parsing_info": {
+    "method": "rule_based",
+    "confidence_score": 0.6,
+    "llm_enhanced": false
+  },
+  "generated_at": "2025-05-25T01:58:04.375848",
+  "files": {
+    "tool": "tool.py",
+    "wrapper": "wrapper.py",
+    "metadata": "metadata.json"
+  },
+  "mcp_schema": {
+    "input_schema": {
+      "amount": {
+        "type": "integer",
+        "description": "amount parameter",
+        "required": true
+      },
+      "currency": {
+        "type": "string",
+        "description": "currency parameter",
+        "required": true
+      }
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string"
+        },
+        "data": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "string"
+        }
+      }
+    },
+    "field_mapping": {
+      "status": "status",
+      "data": "data",
+      "timestamp": "timestamp"
+    }
+  },
+  "input_sources": {
+    "has_api_description": true,
+    "has_usage_code": true,
+    "has_additional_context": false
+  }
+}

@@ -4,3 +4,18 @@ protobuf==6.31.0
 PyYAML==6.0.2
 selectolax==0.3.29
 typing_extensions==4.13.2
+requests>=2.25.0
+
+# LangGraph and LangChain dependencies (optional, for LangGraph integration)
+# Uncomment to enable LangGraph support:
+langgraph>=0.2.0
+langchain-core>=0.3.0
+langchain-anthropic>=0.2.0  # For Anthropic models
+langchain-openai>=0.2.0     # For OpenAI models
+
+# LLM client dependencies for enhanced input parsing (optional)
+# Install only the ones you plan to use:
+openai>=1.0.0               # For OpenAI GPT models
+anthropic>=0.18.0           # For Anthropic Claude models
+# google-generativeai>=0.3.0  # For Google Gemini models  
+# mistralai>=0.1.0           # For Mistral models

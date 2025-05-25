@@ -1,0 +1,123 @@
+OpenWeatherMap Current Weather API
+
+OVERVIEW:
+The OpenWeatherMap Current Weather API provides comprehensive current weather data for any location worldwide. This RESTful API offers reliable weather information including temperature, humidity, pressure, wind conditions, and more.
+
+BASE URL:
+https://api.openweathermap.org/data/2.5/weather
+
+AUTHENTICATION:
+- Type: API Key
+- Location: Query Parameter
+- Parameter Name: appid
+- Required: Yes
+- Get your free API key at: https://openweathermap.org/api
+
+ENDPOINT:
+GET /data/2.5/weather
+
+PARAMETERS:
+Required:
+- q (string): City name, state code (US only), and country code divided by comma. Use ISO 3166 country codes.
+  Examples: "London", "New York,NY,US", "Paris,FR"
+- appid (string): Your unique API key
+
+Optional:
+- units (string): Units of measurement
+  - "standard" (default): Kelvin
+  - "metric": Celsius, meter/sec
+  - "imperial": Fahrenheit, miles/hour
+- lang (string): Language for weather descriptions (en, es, fr, etc.)
+- mode (string): Response format ("json", "xml", "html")
+
+RESPONSE FORMAT:
+Returns JSON object with:
+- coord: Coordinates (lon, lat)
+- weather: Weather conditions array
+  - id: Weather condition id
+  - main: Group of weather parameters (Rain, Snow, Extreme etc.)
+  - description: Weather condition description
+  - icon: Weather icon id
+- base: Internal parameter
+- main: Main weather data
+  - temp: Temperature
+  - feels_like: Human perception temperature
+  - temp_min: Minimum temperature
+  - temp_max: Maximum temperature
+  - pressure: Atmospheric pressure (hPa)
+  - humidity: Humidity percentage
+- visibility: Visibility in meters
+- wind: Wind information
+  - speed: Wind speed
+  - deg: Wind direction (degrees)
+  - gust: Wind gust speed (optional)
+- clouds: Cloudiness percentage
+- dt: Time of data calculation (unix timestamp)
+- sys: System data
+  - type: Internal parameter
+  - id: Internal parameter
+  - country: Country code (ISO 3166)
+  - sunrise: Sunrise time (unix timestamp)
+  - sunset: Sunset time (unix timestamp)
+- timezone: Timezone offset in seconds
+- id: City ID
+- name: City name
+- cod: HTTP status code
+
+EXAMPLE REQUEST:
+GET https://api.openweathermap.org/data/2.5/weather?q=London&appid=YOUR_API_KEY&units=metric
+
+EXAMPLE RESPONSE:
+{
+  "coord": {"lon": -0.1257, "lat": 51.5085},
+  "weather": [
+    {
+      "id": 800,
+      "main": "Clear",
+      "description": "clear sky",
+      "icon": "01d"
+    }
+  ],
+  "base": "stations",
+  "main": {
+    "temp": 15.5,
+    "feels_like": 14.8,
+    "temp_min": 13.2,
+    "temp_max": 17.1,
+    "pressure": 1013,
+    "humidity": 72
+  },
+  "visibility": 10000,
+  "wind": {
+    "speed": 3.2,
+    "deg": 245
+  },
+  "clouds": {"all": 20},
+  "dt": 1646318698,
+  "sys": {
+    "type": 2,
+    "id": 2019646,
+    "country": "GB",
+    "sunrise": 1646295863,
+    "sunset": 1646336264
+  },
+  "timezone": 0,
+  "id": 2643743,
+  "name": "London",
+  "cod": 200
+}
+
+RATE LIMITS:
+- Free tier: 1,000 calls/day, 60 calls/minute
+- Paid plans available for higher limits
+
+ERROR RESPONSES:
+- 401: Invalid API key
+- 404: City not found
+- 429: Rate limit exceeded
+
+USAGE NOTES:
+- City names should be in English or local language
+- For US cities, use format "City,State,US" for better accuracy
+- API returns data in UTC timezone by default
+- Use coordinates for more precise location matching 

@@ -1,0 +1,119 @@
+NewsAPI.org - Everything Endpoint
+
+OVERVIEW:
+The Everything endpoint searches through millions of articles from over 80,000 large and small news sources and blogs. This endpoint is perfect for discovering articles on any topic, from any source, in any language.
+
+BASE URL:
+https://newsapi.org/v2/everything
+
+AUTHENTICATION:
+- Type: API Key
+- Location: Header OR Query Parameter
+- Header: X-API-Key
+- Query Parameter: apiKey
+- Required: Yes
+- Get your free API key at: https://newsapi.org/register
+
+ENDPOINT:
+GET /v2/everything
+
+PARAMETERS:
+Required (at least one):
+- q (string): Keywords or phrases to search for in the article title and body
+  Maximum length: 500 characters
+  Supports operators: AND, OR, NOT, quotes for exact phrases
+  Examples: "bitcoin", "apple AND stock", "tesla OR spacex"
+
+- qInTitle (string): Keywords or phrases to search for in the article title only
+
+- sources (string): Comma-separated string of identifiers for the news sources or blogs you want headlines from
+  Examples: "bbc-news,cnn,reuters"
+  Maximum: 20 sources
+
+- domains (string): Comma-separated string of domains to restrict the search to
+  Examples: "bbc.co.uk,techcrunch.com"
+
+Optional:
+- excludeDomains (string): Comma-separated string of domains to remove from the results
+- from (string): Date and time for the oldest article allowed (ISO 8601 format)
+  Example: "2024-01-01" or "2024-01-01T12:00:00"
+- to (string): Date and time for the newest article allowed (ISO 8601 format)
+- language (string): 2-letter ISO-639-1 code of the language you want headlines for
+  Supported: ar, de, en, es, fr, he, it, nl, no, pt, ru, sv, ud, zh
+- sortBy (string): The order to sort the articles in
+  Options: "relevancy", "popularity", "publishedAt"
+  Default: "publishedAt"
+- pageSize (integer): Number of results to return per page
+  Minimum: 1, Maximum: 100, Default: 100
+- page (integer): Use this to page through results if total results exceed page size
+  Minimum: 1
+
+RESPONSE FORMAT:
+Returns JSON object with:
+- status (string): "ok" if request was successful
+- totalResults (integer): Total number of articles available for the request
+- articles (array): Array of article objects
+  
+Article object contains:
+- source: Information about the source
+  - id: Identifier for the source
+  - name: Display name of the source
+- author (string): Author of the article (may be null)
+- title (string): Headline/title of the article
+- description (string): Description/snippet from the article (may be null)
+- url (string): Direct link to the article
+- urlToImage (string): URL to a relevant image for the article (may be null)
+- publishedAt (string): Date and time article was published (ISO 8601 format)
+- content (string): Unformatted content of the article (truncated to 200 chars)
+
+EXAMPLE REQUEST:
+GET https://newsapi.org/v2/everything?q=technology&from=2024-01-01&sortBy=popularity&apiKey=YOUR_API_KEY
+
+EXAMPLE RESPONSE:
+{
+  "status": "ok",
+  "totalResults": 1234,
+  "articles": [
+    {
+      "source": {
+        "id": "techcrunch",
+        "name": "TechCrunch"
+      },
+      "author": "John Doe",
+      "title": "Latest Technology Breakthrough",
+      "description": "A revolutionary new technology has been announced...",
+      "url": "https://techcrunch.com/2024/01/15/technology-breakthrough",
+      "urlToImage": "https://techcrunch.com/wp-content/uploads/2024/01/tech-image.jpg",
+      "publishedAt": "2024-01-15T10:30:00Z",
+      "content": "A revolutionary new technology has been announced by researchers at..."
+    }
+  ]
+}
+
+RATE LIMITS:
+- Free tier: 500 requests per day
+- Developer plan: 1,000 requests per day
+- Business plan: 50,000 requests per day
+- Enterprise plan: 200,000+ requests per day
+
+ERROR RESPONSES:
+- 400: Bad request (missing required parameters)
+- 401: Unauthorized (invalid API key)
+- 426: Upgrade required (rate limit exceeded)
+- 429: Too many requests
+- 500: Server error
+
+SEARCH TIPS:
+- Use quotes for exact phrase matching: "artificial intelligence"
+- Use + to require a word: +bitcoin +cryptocurrency
+- Use - to exclude words: tesla -stock
+- Use OR for alternative terms: (covid OR coronavirus)
+- Combine operators: "machine learning" AND (python OR AI)
+
+USAGE NOTES:
+- Articles are returned in descending order by publishedAt by default
+- Some sources may have limited historical data
+- Content field is truncated; use the url to get full article
+- Not all articles have images (urlToImage may be null)
+- Free tier has limited historical data (1 month)
+- Business+ plans have access to historical data up to 2 years 

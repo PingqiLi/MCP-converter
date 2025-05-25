@@ -1,0 +1,60 @@
+{
+  "name": "StockTool",
+  "description": "Generated API tool",
+  "version": "1.0.0",
+  "api_info": {
+    "api_name": "Unknown API",
+    "base_url": "https://api.example-stocks.com/v1/quote",
+    "authentication": null,
+    "response_format": null
+  },
+  "parsing_info": {
+    "method": "rule_based",
+    "confidence_score": 0.6,
+    "llm_enhanced": false
+  },
+  "generated_at": "2025-05-25T01:58:04.165093",
+  "files": {
+    "tool": "tool.py",
+    "wrapper": "wrapper.py",
+    "metadata": "metadata.json"
+  },
+  "mcp_schema": {
+    "input_schema": {
+      "symbol": {
+        "type": "string",
+        "description": "symbol parameter",
+        "required": true
+      },
+      "api_key": {
+        "type": "string",
+        "description": "api_key parameter",
+        "required": true
+      }
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string"
+        },
+        "data": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "string"
+        }
+      }
+    },
+    "field_mapping": {
+      "status": "status",
+      "data": "data",
+      "timestamp": "timestamp"
+    }
+  },
+  "input_sources": {
+    "has_api_description": false,
+    "has_usage_code": true,
+    "has_additional_context": false
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "name": "SimpleTest",
+  "description": "Generated API tool",
+  "version": "1.0.0",
+  "api_info": {
+    "api_name": "Unknown API",
+    "base_url": null,
+    "authentication": null,
+    "response_format": null
+  },
+  "parsing_info": {
+    "method": "rule_based",
+    "confidence_score": 0.6,
+    "llm_enhanced": false
+  },
+  "generated_at": "2025-05-25T01:59:34.270914",
+  "files": {
+    "tool": "tool.py",
+    "wrapper": "wrapper.py",
+    "metadata": "metadata.json"
+  },
+  "mcp_schema": {
+    "input_schema": {
+      "input": {
+        "type": "string",
+        "description": "Input parameter for the API",
+        "required": true
+      }
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string"
+        }
+      }
+    },
+    "field_mapping": {
+      "message": "message"
+    }
+  },
+  "input_sources": {
+    "has_api_description": false,
+    "has_usage_code": true,
+    "has_additional_context": false
+  }
+}

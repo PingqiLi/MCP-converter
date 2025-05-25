@@ -9,6 +9,22 @@ class Normalizer:
     """
     _registry: Dict[str, Callable[[Any], Any]] = {}
 
+    def normalize(self, obj: Any) -> Dict[str, Any]:
+        """
+        Main normalize method that converts any object to a normalized dictionary
+        
+        Args:
+            obj: Object to normalize (dataclass, dict, JSON string, etc.)
+            
+        Returns:
+            Normalized dictionary representation
+        """
+        normalized = self.to_dict(obj)
+        if not isinstance(normalized, dict):
+            # If the result is not a dict, wrap it
+            return {"result": normalized}
+        return normalized
+
     @classmethod
     def register(cls, type_name: str, normalizer_fn: Callable[[Any], Any]):
         """Register a new normalizer function for a given type name."""
