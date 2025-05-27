@@ -1,0 +1,52 @@
+Fast Flights API Documentation
+
+Fast Flights is a Python package for scraping Google Flights data. It uses Base64-encoded Protobuf strings to generate flight search queries.
+
+Installation: pip install fast-flights
+
+Main Function: get_flights()
+
+Parameters:
+- flight_data (required): List of FlightData objects
+  - date: Flight date in YYYY-MM-DD format (e.g., "2025-01-01")
+  - from_airport: 3-letter departure airport code (e.g., "TPE")
+  - to_airport: 3-letter arrival airport code (e.g., "MYJ")
+
+- trip (required): Trip type
+  - Options: "one-way", "round-trip"
+  - Note: "multi-city" not yet supported
+
+- seat (required): Seat class
+  - Options: "economy", "premium-economy", "business", "first"
+
+- passengers (required): Passengers object
+  - adults: Number of adult passengers
+  - children: Number of child passengers  
+  - infants_in_seat: Number of infants with seats
+  - infants_on_lap: Number of lap infants
+
+- fetch_mode (optional): Data fetching method
+  - "common": Default scraping method
+  - "fallback": Recommended, uses Playwright serverless functions when needed
+  - "force-fallback": Always uses Playwright serverless functions
+
+Authentication: None required
+
+Response: Result object containing flight information, prices, and availability
+
+Example Usage:
+from fast_flights import FlightData, Passengers, Result, get_flights
+
+result = get_flights(
+    flight_data=[FlightData(date="2025-01-01", from_airport="TPE", to_airport="MYJ")],
+    trip="one-way",
+    seat="economy", 
+    passengers=Passengers(adults=2, children=1, infants_in_seat=0, infants_on_lap=0),
+    fetch_mode="fallback"
+)
+
+Features:
+- Fast Google Flights scraping using Protobuf
+- No API key required
+- Supports fallback to Playwright for reliability
+- Returns structured flight data

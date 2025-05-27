@@ -7,18 +7,42 @@
 ## 🚀 Quick Start (Simplified Workflow)
 
 ### 1. **Environment Setup**
-Set your LLM API key (required):
+Set your LLM API key (required - choose one):
 ```bash
 # OpenAI (recommended)
 export OPENAI_API_KEY="your_openai_api_key"
 
 # OR Anthropic Claude
 export ANTHROPIC_API_KEY="your_anthropic_api_key"
+
+# OR Google Gemini
+export GOOGLE_API_KEY="your_google_api_key"
+
+# OR Mistral AI
+export MISTRAL_API_KEY="your_mistral_api_key"
+
+# OR Perplexity Sonar
+export PERPLEXITY_API_KEY="your_perplexity_api_key"
 ```
 
 Install dependencies:
 ```bash
-pip install openai anthropic  # Choose based on your API key
+# Option 1: Use the interactive installation script (recommended)
+python install.py
+
+# Option 2: Manual installation
+# Install core dependencies
+pip install -r requirements.txt
+
+# Optional: Install LangGraph support (if needed)
+pip install -r requirements-langgraph.txt
+
+# Or install specific LLM providers only:
+pip install openai                    # For OpenAI
+pip install anthropic                 # For Anthropic
+pip install google-generativeai       # For Google Gemini
+pip install mistralai                 # For Mistral AI
+# Note: Perplexity uses OpenAI-compatible API, so just install openai
 ```
 
 ### 2. **Generate a Tool with One Command**
@@ -43,7 +67,7 @@ print(result)
 - **Single input**: API documentation only (text or file)
 - **LLM-powered**: Intelligent analysis of any API documentation
 - **One command**: Generate complete MCP tools instantly
-- **No complexity**: Removed 400+ lines of rule-based code
+- **Clean architecture**: Modular provider system with automatic fallback
 
 ### 🎯 **Enhanced Accuracy**
 - **Smart parameter extraction**: LLM understands complex API docs
@@ -193,17 +217,20 @@ python main.py generate-tool \
 ## 🚨 Requirements & Error Handling
 
 ### Required Environment
-- **LLM API Key**: OpenAI or Anthropic (mandatory)
+- **LLM API Key**: OpenAI, Anthropic, Google Gemini, Perplexity Sonar, or Mistral AI (mandatory)
 - **Python 3.8+**: Modern Python version
-- **Dependencies**: `openai` or `anthropic` package
+- **Dependencies**: Corresponding provider package (`openai`, `anthropic`, `google-generativeai`, or `mistralai`)
 
 ### Common Errors
 ```bash
 # No API key
-❌ No LLM API key found! Set OPENAI_API_KEY or ANTHROPIC_API_KEY
+❌ No LLM API key found! Set OPENAI_API_KEY, ANTHROPIC_API_KEY, GOOGLE_API_KEY, PERPLEXITY_API_KEY, or MISTRAL_API_KEY
 
 # Empty documentation
 ❌ API documentation cannot be empty
+
+# Missing dependencies
+❌ Google Generative AI library not installed. Install with: pip install google-generativeai
 
 # API quota exceeded
 ❌ LLM parsing failed: API quota exceeded
@@ -214,6 +241,7 @@ python main.py generate-tool \
 ## 📚 Documentation
 
 - **[Simplified Workflow Guide](docs/SIMPLIFIED_WORKFLOW_GUIDE.md)** - Complete usage guide
+- **[LLM Provider Support](docs/LLM_PROVIDERS.md)** - Comprehensive guide to all supported LLM providers
 - **[LLM Configuration](config/llm_prompts.json)** - Prompt customization
 - **[Tool Registry](generated_tools/tool_registry.json)** - Generated tools index
 
@@ -241,11 +269,11 @@ api-to-mcp-converter/
 
 ## 🔮 Future Enhancements
 
-- **Multiple LLM providers** (Google Gemini, Mistral)
-- **Specialized prompts** for different API types
+- **Specialized prompts** for different API types (REST, GraphQL, gRPC)
 - **Batch processing** for multiple APIs
 - **Integration templates** for common frameworks
 - **Automatic testing** of generated tools
+- **Advanced error handling** and retry mechanisms
 
 ---
 

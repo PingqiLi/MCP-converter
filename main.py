@@ -1,3 +1,10 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+API-to-MCP Transformation Tool
+Convert any API into MCP-compatible modules using LLM-powered analysis.
+"""
+
 import argparse
 import sys
 import os
@@ -11,7 +18,7 @@ from src.tool_generator import ToolGenerator
 
 def generate_tool_command(args):
     """Handle the generate-tool command"""
-    print(f"🚀 Generating tool: {args.name}")
+    print("🚀 Generating tool: {}".format(args.name))
     print("📝 Using LLM-powered API analysis...")
     
     # Handle API documentation input - either file or direct text
@@ -19,7 +26,7 @@ def generate_tool_command(args):
     
     if args.api_documentation:
         if os.path.exists(args.api_documentation):
-            print(f"📖 Reading API documentation from file: {args.api_documentation}")
+            print("📖 Reading API documentation from file: {}".format(args.api_documentation))
             with open(args.api_documentation, 'r', encoding='utf-8') as f:
                 api_documentation = f.read()
         else:
@@ -39,11 +46,11 @@ def generate_tool_command(args):
             api_documentation=api_documentation,
             output_dir=args.output_dir
         )
-        print(f"✅ Tool '{args.name}' generated successfully!")
-        print(f"📁 Location: {args.output_dir}/{args.name.lower()}/")
+        print("✅ Tool '{}' generated successfully!".format(args.name))
+        print("📁 Location: {}/{}/".format(args.output_dir, args.name.lower()))
         return 0
     except Exception as e:
-        print(f"❌ Error generating tool: {e}")
+        print("❌ Error generating tool: {}".format(e))
         return 1
 
 
