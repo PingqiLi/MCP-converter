@@ -2,6 +2,7 @@ import json
 from typing import Dict, Any, Optional
 import os
 from pathlib import Path
+from src.core.mcp_tool import MCPTool
 
 class OutputGenerator:
     """
@@ -53,7 +54,7 @@ import os
 import json
 import requests
 from typing import Any, Dict
-from src.mcp_tool import MCPTool
+from src.core.mcp_tool import MCPTool
 
 {main_function}
 

@@ -6,12 +6,12 @@ import json
 from pathlib import Path
 from typing import Dict, Any
 
-from .input_parser import InputParser
-from .sandbox import Sandbox
-from .normalizer import Normalizer
-from .field_mapper import FieldMapper
-from .validator import Validator
-from .output_generator import OutputGenerator
+from ..llm.input_parser import InputParser
+from ..utils.sandbox import Sandbox
+from ..utils.normalizer import Normalizer
+from ..utils.field_mapper import FieldMapper
+from ..utils.validator import Validator
+from ..generators.output_generator import OutputGenerator
 
 
 class ToolGenerator:

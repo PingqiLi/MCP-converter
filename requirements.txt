@@ -1,17 +1,12 @@
 # Core dependencies for MCP-converter
-fast-flights==2.2
-primp==0.15.0
-PyYAML==6.0.2
-selectolax==0.3.29
-typing_extensions==4.13.2
 requests>=2.25.0
+PyYAML>=6.0.0
 
-# LLM client dependencies for enhanced input parsing
-# Install only the ones you plan to use:
-openai>=1.0.0               # For OpenAI GPT models
-anthropic>=0.18.0           # For Anthropic Claude models
-google-generativeai         # For Google Gemini models  
-mistralai                   # For Mistral models
+# LLM providers (install at least one)
+openai>=1.0.0
+anthropic>=0.18.0
+google-generativeai>=0.3.0
+mistralai>=0.1.0
 
 # LangGraph and LangChain dependencies (optional, for LangGraph integration)
 # Uncomment the following lines to enable LangGraph support:
