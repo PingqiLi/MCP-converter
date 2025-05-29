@@ -5,13 +5,101 @@ Test script for all LLM provider integrations with InputParser
 
 import os
 import sys
+import unittest
 from pathlib import Path
 
 # Add src to path
-sys.path.insert(0, str(Path(__file__).parent / "src"))
+sys.path.insert(0, str(Path(__file__).parent.parent.parent / "src"))
+
+class TestLLMProviderIntegration(unittest.TestCase):
+    """Test LLM provider integration functionality"""
+    
+    def setUp(self):
+        """Set up test environment"""
+        # Check if any LLM API key is available
+        self.llm_available = any(os.getenv(key) for key in [
+            "OPENAI_API_KEY", "ANTHROPIC_API_KEY", "GOOGLE_API_KEY", 
+            "MISTRAL_API_KEY", "PERPLEXITY_API_KEY"
+        ])
+        
+        if not self.llm_available:
+            self.skipTest("No LLM API key found - skipping LLM-dependent tests")
+    
+    def test_provider_registry(self):
+        """Test the provider registry functionality"""
+        
+        try:
+            from input_parser import LLMProviderRegistry
+            
+            registry = LLMProviderRegistry()
+            
+            # Test provider list
+            self.assertIsInstance(registry.providers, dict)
+            self.assertIsInstance(registry.priority_order, list)
+            
+            # Test available providers
+            available = registry.get_available_providers()
+            self.assertIsInstance(available, list)
+            
+            if available:
+                # Test provider creation for available providers
+                for provider_name in available[:1]:  # Test only first available
+                    config = {"model": "test", "temperature": 0.1, "max_tokens": 100}
+                    provider = registry.create_provider(provider_name, config)
+                    self.assertIsNotNone(provider)
+            
+        except ImportError as e:
+            self.skipTest(f"Could not import LLMProviderRegistry: {e}")
+    
+    def test_input_parser_integration(self):
+        """Test InputParser with available LLM provider"""
+        
+        try:
+            from input_parser import InputParser
+            
+            # Test API documentation
+            test_doc = """
+            Weather API Documentation
+            
+            Base URL: https://api.weather.com/v1
+            
+            Endpoint: /current
+            Method: GET
+            Description: Get current weather for a location
+            
+            Parameters:
+            - location (required): City name or coordinates
+            - units (optional): Temperature units (celsius, fahrenheit)
+            - api_key (required): Your API key for authentication
+            
+            Authentication: API key in query parameter
+            
+            Response: JSON with temperature, humidity, conditions
+            """
+            
+            # Initialize parser
+            parser = InputParser()
+            self.assertIsNotNone(parser)
+            
+            # Parse the documentation (this uses the LLM)
+            result = parser.parse(test_doc)
+            
+            # Verify result structure
+            self.assertIsInstance(result, dict)
+            
+            # Verify expected fields are present
+            expected_fields = ['api_name', 'description', 'endpoints', 'parameters']
+            for field in expected_fields:
+                self.assertIn(field, result, f"Missing field: {field}")
+            
+        except ImportError as e:
+            self.skipTest(f"Could not import InputParser: {e}")
+        except Exception as e:
+            self.fail(f"InputParser integration test failed: {e}")
+
 
 def test_provider_integration(provider_name: str, api_key_env: str):
-    """Test a specific provider integration"""
+    """Test a specific provider integration (helper function for manual testing)"""
     
     # Check if API key is set
     if not os.getenv(api_key_env):
@@ -76,53 +164,11 @@ def test_provider_integration(provider_name: str, api_key_env: str):
         print(f"❌ Error testing {provider_name} integration: {e}")
         return False
 
-def test_provider_registry():
-    """Test the provider registry functionality"""
-    
-    try:
-        from input_parser import LLMProviderRegistry
-        
-        print("🧪 Testing LLM Provider Registry...")
-        
-        registry = LLMProviderRegistry()
-        
-        # Test provider list
-        print(f"📋 Registered providers: {list(registry.providers.keys())}")
-        print(f"📋 Priority order: {registry.priority_order}")
-        
-        # Test available providers
-        available = registry.get_available_providers()
-        print(f"✅ Available providers: {available}")
-        
-        if not available:
-            print("⚠️  No providers available (no API keys set)")
-            return True
-        
-        # Test provider creation
-        for provider_name in available:
-            try:
-                # Get a dummy config for testing
-                config = {"model": "test", "temperature": 0.1, "max_tokens": 100}
-                provider = registry.create_provider(provider_name, config)
-                print(f"✅ Successfully created {provider_name} provider")
-            except Exception as e:
-                print(f"❌ Failed to create {provider_name} provider: {e}")
-                return False
-        
-        return True
-        
-    except Exception as e:
-        print(f"❌ Error testing provider registry: {e}")
-        return False
 
-def main():
-    """Run all provider tests"""
+def run_manual_provider_tests():
+    """Run manual tests for all providers (not part of unittest)"""
     
     print("🚀 Starting LLM Provider Integration Tests\n")
-    
-    # Test provider registry first
-    registry_success = test_provider_registry()
-    print()
     
     # Test individual providers
     providers_to_test = [
@@ -141,7 +187,6 @@ def main():
     
     # Summary
     print("📊 Test Results Summary:")
-    print(f"   Registry: {'✅ PASS' if registry_success else '❌ FAIL'}")
     
     for provider_name, success in results.items():
         api_key_env = next(env for name, env in providers_to_test if name == provider_name)
@@ -161,12 +206,15 @@ def main():
         return 1
     
     failed_tests = [name for name in tested_providers if not results[name]]
-    if failed_tests or not registry_success:
+    if failed_tests:
         print(f"\n❌ Some tests failed: {failed_tests}")
         return 1
     else:
         print("\n🎉 All tests passed!")
         return 0
 
+
 if __name__ == "__main__":
-    sys.exit(main()) 
+    # If run directly, run manual tests
+    import sys
+    sys.exit(run_manual_provider_tests()) 

@@ -8,12 +8,11 @@ import unittest
 import json
 from pathlib import Path
 
-# Add current directory to path
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'src'))
+# Add src to path
+sys.path.insert(0, str(Path(__file__).parent.parent.parent / "src"))
 
-from src.mcp_server import MCPServer
-from src.langgraph_adapter import LangGraphAdapter
+from server.mcp_server import MCPServer
+from server.langgraph_adapter import LangGraphAdapter
 
 
 class TestMCPServerIntegration(unittest.TestCase):
@@ -21,18 +20,19 @@ class TestMCPServerIntegration(unittest.TestCase):
     
     def setUp(self):
         """Set up test fixtures"""
-        self.server = MCPServer(tools_dir="generated_tools")
+        self.server = MCPServer(tools_directory="generated_tools")
     
     def test_server_initialization(self):
         """Test that MCP server initializes correctly"""
         self.assertIsNotNone(self.server)
-        self.assertEqual(self.server.tools_dir, "generated_tools")
+        # Convert Path to string for comparison
+        self.assertEqual(str(self.server.tools_directory), "generated_tools")
     
     def test_tool_discovery(self):
         """Test that server can discover tools"""
-        tools = self.server.discover_tools()
-        self.assertIsInstance(tools, list)
-        # Tools list might be empty if no tools are generated yet
+        self.server.discover_tools()
+        # Should not raise exceptions
+        self.assertIsInstance(self.server.tools, dict)
     
     def test_tool_registry_exists(self):
         """Test that tool registry exists or can be created"""
@@ -49,18 +49,19 @@ class TestLangGraphIntegration(unittest.TestCase):
     
     def setUp(self):
         """Set up test fixtures"""
-        self.adapter = LangGraphAdapter(tools_dir="generated_tools")
+        self.adapter = LangGraphAdapter()  # No parameters needed
     
     def test_adapter_initialization(self):
         """Test that LangGraph adapter initializes correctly"""
         self.assertIsNotNone(self.adapter)
-        self.assertEqual(self.adapter.tools_dir, "generated_tools")
+        self.assertIsInstance(self.adapter.tools, dict)
+        self.assertIsInstance(self.adapter.functions, list)
     
     def test_tool_conversion(self):
         """Test that adapter can convert tools"""
         # This test will pass even if no tools exist
         try:
-            langgraph_tools = self.adapter.convert_all_tools()
+            langgraph_tools = self.adapter.get_langgraph_tools()
             self.assertIsInstance(langgraph_tools, list)
         except Exception as e:
             # If no tools exist, that's okay for this test
@@ -73,14 +74,14 @@ class TestEndToEndIntegration(unittest.TestCase):
     def test_tool_generation_to_server(self):
         """Test that a generated tool can be served by MCP server"""
         # This is more of a smoke test - just verify the components work together
-        server = MCPServer(tools_dir="generated_tools")
-        adapter = LangGraphAdapter(tools_dir="generated_tools")
+        server = MCPServer(tools_directory="generated_tools")
+        adapter = LangGraphAdapter()  # No parameters needed
         
         # Should not raise exceptions
-        tools = server.discover_tools()
-        langgraph_tools = adapter.convert_all_tools()
+        server.discover_tools()
+        langgraph_tools = adapter.get_langgraph_tools()
         
-        self.assertIsInstance(tools, list)
+        self.assertIsInstance(server.tools, dict)
         self.assertIsInstance(langgraph_tools, list)
 
 

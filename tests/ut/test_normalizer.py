@@ -1,5 +1,11 @@
 import unittest
-from src.normalizer import Normalizer
+import sys
+from pathlib import Path
+
+# Add src to path
+sys.path.insert(0, str(Path(__file__).parent.parent.parent / "src"))
+
+from utils.normalizer import Normalizer
 from dataclasses import dataclass
 
 @dataclass
@@ -12,6 +18,28 @@ class CustomType:
         self.value = value
 
 class TestNormalizer(unittest.TestCase):
+    def test_dict_normalization(self):
+        normalizer = Normalizer()
+        data = {"key": "value"}
+        result = normalizer.normalize(data)
+        self.assertEqual(result, data)
+
+    def test_object_normalization(self):
+        class TestObj:
+            def __init__(self):
+                self.attr = "value"
+        
+        normalizer = Normalizer()
+        obj = TestObj()
+        result = normalizer.normalize(obj)
+        self.assertEqual(result, {"attr": "value"})
+
+    def test_json_string_normalization(self):
+        normalizer = Normalizer()
+        json_str = '{"key": "value"}'
+        result = normalizer.normalize(json_str)
+        self.assertEqual(result, {"key": "value"})
+
     def test_to_dict_from_dataclass(self):
         w = Weather(city="London", temp=20.5)
         result = Normalizer.to_dict(w)

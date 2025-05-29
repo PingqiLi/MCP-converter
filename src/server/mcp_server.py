@@ -1,6 +1,7 @@
 """
 MCP Server Implementation
 Serves generated MCP tools via the Model Context Protocol
+Compatible with LangChain MCP Adapters: https://github.com/langchain-ai/langchain-mcp-adapters
 """
 
 import asyncio
@@ -15,19 +16,41 @@ import os
 # Add project root to path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
-from src.core.mcp_tool import MCPTool
-
 logger = logging.getLogger(__name__)
+
+
+def is_mcp_tool_compatible(obj: Any) -> bool:
+    """
+    Check if an object is MCP tool compatible (duck typing).
+    A tool is compatible if it has the required attributes and methods.
+    """
+    required_attributes = ['name', 'description', 'parameters_schema']
+    required_methods = ['run', 'validate']
+    
+    # Check if all required attributes exist
+    for attr in required_attributes:
+        if not hasattr(obj, attr):
+            return False
+    
+    # Check if all required methods exist and are callable
+    for method in required_methods:
+        if not hasattr(obj, method) or not callable(getattr(obj, method)):
+            return False
+    
+    return True
 
 
 class MCPServer:
     """
-    MCP Server that dynamically loads and serves generated MCP tools using the tool registry
+    MCP Server that dynamically loads and serves generated MCP tools using the tool registry.
+    Works with any tool class that has the required interface (duck typing).
+    
+    Compatible with LangChain MCP Adapters for both stdio and HTTP transport.
     """
     
     def __init__(self, tools_directory: str = "generated_tools"):
         self.tools_directory = Path(tools_directory)
-        self.tools: Dict[str, MCPTool] = {}
+        self.tools: Dict[str, Any] = {}  # Changed from MCPTool to Any
         self.tool_schemas: Dict[str, Dict[str, Any]] = {}
         
     def discover_tools(self) -> None:
@@ -89,42 +112,81 @@ class MCPServer:
         # Find the tool class (should match the tool name)
         tool_class = getattr(module, tool_name, None)
         if tool_class is None:
-            # Try to find any MCPTool subclass
+            # Try to find any compatible tool class
             for attr_name in dir(module):
                 attr = getattr(module, attr_name)
-                if (isinstance(attr, type) and 
-                    issubclass(attr, MCPTool) and 
-                    attr != MCPTool):
-                    tool_class = attr
-                    break
+                if isinstance(attr, type):
+                    # Try to instantiate and check compatibility
+                    try:
+                        test_instance = attr()
+                        if is_mcp_tool_compatible(test_instance):
+                            tool_class = attr
+                            break
+                    except Exception:
+                        continue
         
         if tool_class is None:
-            raise ValueError(f"No MCP tool class found in {tool_file}")
+            raise ValueError(f"No compatible MCP tool class found in {tool_file}")
         
         # Instantiate the tool
         tool_instance = tool_class()
+        
+        # Validate that the instance is MCP compatible
+        if not is_mcp_tool_compatible(tool_instance):
+            raise ValueError(f"Tool {tool_name} is not MCP compatible")
+        
         self.tools[tool_instance.name] = tool_instance
         
-        # Store the schema for MCP protocol
+        # Store the schema for MCP protocol - enhanced for LangChain compatibility
         self.tool_schemas[tool_instance.name] = {
             "name": tool_instance.name,
             "description": tool_instance.description,
             "inputSchema": {
                 "type": "object",
-                "properties": tool_instance.parameters_schema,
+                "properties": self._convert_schema_for_langchain(tool_instance.parameters_schema),
                 "required": list(tool_instance.parameters_schema.keys())
             }
         }
         
         logger.info(f"Loaded tool from registry: {tool_instance.name}")
     
+    def _convert_schema_for_langchain(self, schema: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Convert tool parameter schema to be fully compatible with LangChain MCP adapters
+        """
+        converted = {}
+        for param_name, param_info in schema.items():
+            converted_param = param_info.copy()
+            
+            # Ensure type is specified
+            if 'type' not in converted_param:
+                converted_param['type'] = 'string'
+            
+            # Add description if missing
+            if 'description' not in converted_param:
+                converted_param['description'] = f"Parameter {param_name}"
+            
+            # Handle array types specifically for LangChain
+            if converted_param['type'] == 'array':
+                if 'items' not in converted_param:
+                    converted_param['items'] = {'type': 'object'}
+            
+            # Handle object types
+            elif converted_param['type'] == 'object':
+                if 'properties' not in converted_param:
+                    converted_param['properties'] = {}
+            
+            converted[param_name] = converted_param
+        
+        return converted
+    
     def _discover_tools_by_scanning(self) -> None:
-        """Fallback method: Discover tools by scanning for *_tool.py files"""
+        """Fallback method: Discover tools by scanning for tool.py files"""
         if not self.tools_directory.exists():
             logger.warning(f"Tools directory {self.tools_directory} does not exist")
             return
             
-        for tool_file in self.tools_directory.rglob("*_tool.py"):
+        for tool_file in self.tools_directory.rglob("tool.py"):
             try:
                 self._load_tool_from_file(tool_file)
             except Exception as e:
@@ -133,37 +195,51 @@ class MCPServer:
     def _load_tool_from_file(self, tool_file: Path) -> None:
         """Load a single MCP tool from a Python file (legacy method)"""
         # Import the module
-        module_name = tool_file.stem
+        module_name = f"{tool_file.parent.name}_tool"
         spec = importlib.util.spec_from_file_location(module_name, tool_file)
         if spec is None or spec.loader is None:
             raise ValueError(f"Could not load spec for {tool_file}")
             
         module = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(module)
+        
+        # Add the tool directory to sys.path temporarily
+        tool_dir_str = str(tool_file.parent)
+        if tool_dir_str not in sys.path:
+            sys.path.insert(0, tool_dir_str)
+        
+        try:
+            spec.loader.exec_module(module)
+        finally:
+            # Remove from sys.path
+            if tool_dir_str in sys.path:
+                sys.path.remove(tool_dir_str)
         
         # Find MCP tool classes in the module
         for attr_name in dir(module):
             attr = getattr(module, attr_name)
-            if (isinstance(attr, type) and 
-                issubclass(attr, MCPTool) and 
-                attr != MCPTool):
-                
-                # Instantiate the tool
-                tool_instance = attr()
-                self.tools[tool_instance.name] = tool_instance
-                
-                # Store the schema for MCP protocol
-                self.tool_schemas[tool_instance.name] = {
-                    "name": tool_instance.name,
-                    "description": tool_instance.description,
-                    "inputSchema": {
-                        "type": "object",
-                        "properties": tool_instance.parameters_schema,
-                        "required": list(tool_instance.parameters_schema.keys())
-                    }
-                }
-                
-                logger.info(f"Loaded tool (legacy scan): {tool_instance.name}")
+            if isinstance(attr, type):
+                try:
+                    # Try to instantiate and check compatibility
+                    tool_instance = attr()
+                    if is_mcp_tool_compatible(tool_instance):
+                        self.tools[tool_instance.name] = tool_instance
+                        
+                        # Store the schema for MCP protocol - enhanced for LangChain compatibility
+                        self.tool_schemas[tool_instance.name] = {
+                            "name": tool_instance.name,
+                            "description": tool_instance.description,
+                            "inputSchema": {
+                                "type": "object",
+                                "properties": self._convert_schema_for_langchain(tool_instance.parameters_schema),
+                                "required": list(tool_instance.parameters_schema.keys())
+                            }
+                        }
+                        
+                        logger.info(f"Loaded tool from file: {tool_instance.name}")
+                        break  # Only load one tool per file
+                except Exception as e:
+                    logger.debug(f"Could not instantiate {attr_name}: {e}")
+                    continue
     
     def list_tools(self) -> List[Dict[str, Any]]:
         """Return list of available tools for MCP protocol"""

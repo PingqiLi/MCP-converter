@@ -6,12 +6,13 @@ Tests the new API documentation input method
 import sys
 import os
 import unittest
+from pathlib import Path
 
-# Add current directory to path
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'src'))
+# Add src to path (same approach as main.py)
+project_root = Path(__file__).parent.parent.parent
+sys.path.append(str(project_root / "src"))
 
-from src.tool_generator import ToolGenerator
+from src.core.tool_generator import ToolGenerator
 
 
 class TestSimplifiedWorkflow(unittest.TestCase):

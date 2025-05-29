@@ -1,7 +1,13 @@
 import unittest
 import os
 import json
-from src.output_generator import OutputGenerator
+import sys
+from pathlib import Path
+
+# Add src to path
+sys.path.insert(0, str(Path(__file__).parent.parent.parent / "src"))
+
+from generators.output_generator import OutputGenerator
 
 class TestOutputGenerator(unittest.TestCase):
     def setUp(self):

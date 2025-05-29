@@ -2,6 +2,8 @@
 
 🤖 **LLM-Powered API Analysis** - Convert any API into MCP (Model Context Protocol) compatible modules using intelligent documentation analysis. This tool automates the process of generating new MCP tools from comprehensive API documentation, leveraging LLM capabilities for accurate parameter extraction and tool generation.
 
+**🔗 LangChain Compatible**: Generated tools work seamlessly with [LangChain's official MCP adapters](https://github.com/langchain-ai/langchain-mcp-adapters) for instant LangGraph integration.
+
 ---
 
 ## 🚀 Quick Start
@@ -38,10 +40,32 @@ python main.py \
 ```
 
 ### 3. **Use Your Generated Tool**
+
+#### Option A: Direct Usage
 ```python
 from generated_tools.weathertool.wrapper import run_weathertool
 result = run_weathertool(q="London", appid="your_api_key")
 print(result)
+```
+
+#### Option B: With LangChain MCP Adapters
+```python
+# Install: pip install langchain-mcp-adapters langgraph
+from langchain_mcp_adapters.client import MultiServerMCPClient
+from langgraph.prebuilt import create_react_agent
+
+# Start MCP server
+# python launch_mcp_server.py --transport langchain --port 3000
+
+client = MultiServerMCPClient({
+    "generated_tools": {
+        "url": "http://localhost:3000/mcp",
+        "transport": "streamable_http"
+    }
+})
+
+tools = await client.get_tools()
+agent = create_react_agent("openai:gpt-4", tools)
 ```
 
 ---
@@ -62,8 +86,15 @@ print(result)
 
 ### 🔧 **Complete Tool Generation**
 - **MCP-compatible**: Full Model Context Protocol support
+- **LangChain ready**: Works with official LangChain MCP adapters
 - **Rich metadata**: Detailed tool information and configuration
 - **Clean structure**: Organized codebase with proper package hierarchy
+
+### 🌐 **Multiple Integration Options**
+- **Standalone**: Use tools directly in Python
+- **MCP Server**: Host tools via MCP protocol (stdio/HTTP)
+- **LangChain**: Integrate with LangGraph agents
+- **Multi-framework**: Support for any framework using the interface
 
 ---
 
@@ -92,120 +123,60 @@ python main.py \
 
 ---
 
+## 🔗 LangChain MCP Adapters Integration
+
+This project generates tools that are **fully compatible** with [LangChain's official MCP adapters](https://github.com/langchain-ai/langchain-mcp-adapters). Your generated tools can be used directly in LangGraph agents and LangChain workflows.
+
+### Quick LangChain Setup
+
+1. **Install LangChain MCP Adapters**:
+   ```bash
+   pip install langchain-mcp-adapters langgraph "langchain[openai]"
+   ```
+
+2. **Start MCP Server**:
+   ```bash
+   # Stdio transport
+   python launch_mcp_server.py
+   
+   # HTTP transport (recommended for LangChain)
+   python launch_mcp_server.py --transport langchain --port 3000
+   ```
+
+3. **Use with LangGraph**:
+   ```python
+   import asyncio
+   from mcp import ClientSession, StdioServerParameters
+   from mcp.client.stdio import stdio_client
+   from langchain_mcp_adapters.tools import load_mcp_tools
+   from langgraph.prebuilt import create_react_agent
+   from langchain_openai import ChatOpenAI
+
+   async def main():
+       server_params = StdioServerParameters(
+           command="python", args=["launch_mcp_server.py"]
+       )
+       
+       async with stdio_client(server_params) as (read, write):
+           async with ClientSession(read, write) as session:
+               await session.initialize()
+               tools = await load_mcp_tools(session)
+               
+               model = ChatOpenAI(model="gpt-4")
+               agent = create_react_agent(model=model, tools=tools)
+               
+               response = await agent.ainvoke({
+                   "messages": [{"role": "user", "content": "Use the tools to help me"}]
+               })
+               print(response)
+
+   asyncio.run(main())
+   ```
+
+📚 **Full Documentation**: See [`LANGCHAIN_MCP_INTEGRATION.md`](LANGCHAIN_MCP_INTEGRATION.md) for comprehensive examples, multi-server setup, FastMCP integration, and troubleshooting.
+
+---
+
 ## 📁 Project Structure
 
 ```
-src/
-├── core/                        # Core functionality
-│   ├── tool_generator.py        # Main orchestrator
-│   ├── mcp_tool.py              # Base MCP tool class
-│   └── apiclient.py             # Base API client class
-├── llm/                         # LLM providers and parsing
-│   └── input_parser.py          # LLM-powered API analysis
-├── generators/                  # Code generation
-│   └── output_generator.py      # Tool and wrapper generation
-├── utils/                       # Utility functions
-│   ├── normalizer.py            # Data normalization
-│   ├── validator.py             # Input validation
-│   ├── field_mapper.py          # Field mapping
-│   └── sandbox.py               # Safe code execution
-└── server/                      # Server components
-    ├── mcp_server.py            # MCP protocol server
-    └── langgraph_adapter.py     # LangGraph integration
-```
-
-### Generated Tool Structure
-
-```
-generated_tools/
-├── tool_registry.json           # Central registry
-└── yourtool/
-    ├── tool.py                  # Main MCP tool class
-    ├── wrapper.py               # Function wrapper
-    └── metadata.json            # Tool metadata
-```
-
----
-
-## 🤖 LLM Configuration
-
-The tool uses external configuration for prompts and models in `config/llm_prompts.json`:
-
-```json
-{
-  "api_analysis_prompt": {
-    "system_message": "You are an expert API analyst...",
-    "user_prompt_template": "Analyze the following API documentation..."
-  },
-  "models": {
-    "openai": {"model": "gpt-4o-mini", "temperature": 0.1},
-    "anthropic": {"model": "claude-3-haiku-20240307", "temperature": 0.1}
-  }
-}
-```
-
----
-
-## 🔧 Advanced Features
-
-### MCP Server Integration
-```python
-# Start MCP server with generated tools
-from src.server.mcp_server import MCPServer
-server = MCPServer()
-server.discover_tools()  # Load all tools from generated_tools/
-```
-
-### LangGraph Compatibility
-```python
-# Convert MCP tools to LangGraph functions
-from src.server.langgraph_adapter import LangGraphAdapter
-adapter = LangGraphAdapter()
-langgraph_tools = adapter.convert_all_tools()
-```
-
----
-
-## 📊 What's New in v0.3.0
-
-### ✅ **Simplified**
-- **Removed**: Non-conventional `install.py` script
-- **Removed**: Subparser complexity - direct command interface
-- **Removed**: Redundant dependencies and files
-- **Added**: Clean package structure with logical organization
-
-### 🏗️ **Better Architecture**
-- **Core**: Main functionality (`tool_generator`, `mcp_tool`, `apiclient`)
-- **LLM**: AI providers and parsing (`input_parser`)
-- **Generators**: Code generation utilities (`output_generator`)
-- **Utils**: Data processing (`normalizer`, `validator`, `field_mapper`, `sandbox`)
-- **Server**: MCP server and adapters (`mcp_server`, `langgraph_adapter`)
-
-### 📦 **Minimal Dependencies**
-```txt
-# Core dependencies only
-requests>=2.25.0
-PyYAML>=6.0.0
-
-# LLM providers (install at least one)
-openai>=1.0.0
-anthropic>=0.18.0
-google-generativeai>=0.3.0
-mistralai>=0.1.0
-```
-
----
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes following the new package structure
-4. Test with `python main.py --help`
-5. Submit a pull request
-
----
-
-## 📄 License
-
-MIT License - see LICENSE file for details. 

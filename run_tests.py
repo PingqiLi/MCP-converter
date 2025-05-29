@@ -14,6 +14,9 @@ project_root = Path(__file__).parent
 sys.path.insert(0, str(project_root))
 sys.path.insert(0, str(project_root / "src"))
 
+# Change to project root directory for test discovery
+os.chdir(project_root)
+
 
 def discover_and_run_tests(test_type="all", verbosity=2):
     """Discover and run tests based on type"""
@@ -37,22 +40,22 @@ def discover_and_run_tests(test_type="all", verbosity=2):
         # Run all tests (both unit and system)
         print("📋 Running all test suites...")
         print("🔧 Discovering unit tests...")
-        ut_tests = loader.discover(str(project_root / "tests" / "ut"), pattern="test_*.py")
+        ut_tests = loader.discover("tests/ut", pattern="test_*.py")
         suite.addTests(ut_tests)
         print("🔗 Discovering system tests...")
-        st_tests = loader.discover(str(project_root / "tests" / "st"), pattern="test_*.py")
+        st_tests = loader.discover("tests/st", pattern="test_*.py")
         suite.addTests(st_tests)
     
     elif test_type in ["unit", "ut"]:
         # Run only unit tests
         print("🔧 Running unit tests...")
-        discovered = loader.discover(str(project_root / "tests" / "ut"), pattern="test_*.py")
+        discovered = loader.discover("tests/ut", pattern="test_*.py")
         suite.addTests(discovered)
     
     elif test_type in ["system", "st"]:
         # Run only system tests
         print("🔗 Running system tests...")
-        discovered = loader.discover(str(project_root / "tests" / "st"), pattern="test_*.py")
+        discovered = loader.discover("tests/st", pattern="test_*.py")
         suite.addTests(discovered)
     
     elif test_type == "integration":
