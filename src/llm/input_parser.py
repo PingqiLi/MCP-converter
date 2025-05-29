@@ -375,8 +375,12 @@ class InputParser:
     def _standardize_llm_response(self, parsed: Dict[str, Any]) -> Dict[str, Any]:
         """Standardize LLM response to match our expected format"""
         return {
+            "api_type": parsed.get("api_type", "rest"),  # Preserve API type from LLM
             "api_name": parsed.get("api_name", "Unknown API"),
             "description": parsed.get("description", "Generated API tool"),
+            "package_name": parsed.get("package_name"),  # For Python packages
+            "main_function": parsed.get("main_function", {}),  # For Python packages
+            "installation": parsed.get("installation", {}),  # For Python packages
             "base_url": parsed.get("base_url"),
             "endpoints": parsed.get("endpoints", []),
             "parameters": parsed.get("parameters", {}),

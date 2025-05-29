@@ -1,0 +1,6 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+If it is under Windows environment, powershell or command lines, launch a wsl session instead.

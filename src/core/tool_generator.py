@@ -82,7 +82,8 @@ class ToolGenerator:
             parameters_schema=mcp_mapping.get('input_schema', {}),
             sample_response=normalized_response,
             usage_code=self._generate_usage_code_from_parsed_data(parsed_data),
-            output_file=str(tool_class_path)
+            output_file=str(tool_class_path),
+            parsed_data=parsed_data
         )
         
         self.output_generator.generate_wrapper(
