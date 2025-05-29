@@ -1,5 +1,5 @@
 {
-  "name": "fast_flights",
+  "name": "FastFlightsTool",
   "description": "An API for scraping Google Flights data using Base64-encoded Protobuf strings. It provides structured flight information, prices, and availability without requiring an API key.",
   "version": "1.0.0",
   "api_info": {
@@ -15,19 +15,15 @@
     "response_format": {
       "type": "json",
       "content_type": "application/json",
-      "structure": "The response contains a Result object with flight information, prices, and availability.",
+      "structure": "A Result object containing flight information, prices, and availability.",
       "example": {
-        "flights": [
-          {
-            "flight_number": "example_flight",
-            "departure_airport": "TPE",
-            "arrival_airport": "MYJ",
-            "departure_time": "2025-01-01 08:00",
-            "arrival_time": "2025-01-01 10:00",
-            "price": 500.0,
-            "availability": true
-          }
-        ]
+        "flight_info": {
+          "flight_number": "example_number",
+          "departure_time": "example_time",
+          "arrival_time": "example_time",
+          "price": 100.0,
+          "availability": true
+        }
       }
     },
     "endpoints": [
@@ -35,7 +31,7 @@
         "path": "Not applicable (local function)",
         "method": "Not applicable (local function)",
         "description": "The get_flights function is used to retrieve flight data based on the provided parameters.",
-        "summary": "Retrieve flight data using various parameters."
+        "summary": "Retrieve flight data from Google Flights"
       }
     ]
   },
@@ -45,7 +41,7 @@
     "llm_provider": "perplexity",
     "llm_enhanced": true
   },
-  "generated_at": "2025-05-28T01:47:50.786796",
+  "generated_at": "2025-05-29T01:35:58.044798",
   "files": {
     "tool": "tool.py",
     "wrapper": "wrapper.py",

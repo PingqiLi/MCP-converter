@@ -1,5 +1,5 @@
 """
-Wrapper for fast_flights
+Wrapper for FastFlightsOriginal
 Provides a simple function interface for the MCP tool
 """
 import sys
@@ -11,11 +11,11 @@ tool_dir = Path(__file__).parent
 if str(tool_dir) not in sys.path:
     sys.path.insert(0, str(tool_dir))
 
-from tool import fast_flights
+from tool import FastFlightsOriginal
 
-def run_fast_flights(**kwargs):
+def run_fastflightsoriginal(**kwargs):
     """
-    Run fast_flights with the given parameters
+    Run FastFlightsOriginal with the given parameters
     
     Args:
         **kwargs: Parameters for the tool
@@ -23,17 +23,17 @@ def run_fast_flights(**kwargs):
     Returns:
         Result from the tool execution
     """
-    tool = fast_flights()
+    tool = FastFlightsOriginal()
     
     if not tool.validate(kwargs):
-        raise ValueError(f"Invalid parameters for fast_flights: {kwargs}")
+        raise ValueError(f"Invalid parameters for FastFlightsOriginal: {kwargs}")
     
     return tool.run(kwargs)
 
 # Example usage:
 if __name__ == "__main__":
     try:
-        result = run_fast_flights(city="London")
+        result = run_fastflightsoriginal(city="London")
         print(f"Result: {result}")
     except Exception as e:
         print(f"Error: {e}")

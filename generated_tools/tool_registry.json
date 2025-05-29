@@ -1,9 +1,9 @@
 {
   "tools": {
-    "fast_flights": {
-      "directory": "fast_flights",
+    "FastFlightsTool": {
+      "directory": "fastflightstool",
       "metadata": {
-        "name": "fast_flights",
+        "name": "FastFlightsTool",
         "description": "An API for scraping Google Flights data using Base64-encoded Protobuf strings. It provides structured flight information, prices, and availability without requiring an API key.",
         "version": "1.0.0",
         "api_info": {
@@ -19,19 +19,15 @@
           "response_format": {
             "type": "json",
             "content_type": "application/json",
-            "structure": "The response contains a Result object with flight information, prices, and availability.",
+            "structure": "A Result object containing flight information, prices, and availability.",
             "example": {
-              "flights": [
-                {
-                  "flight_number": "example_flight",
-                  "departure_airport": "TPE",
-                  "arrival_airport": "MYJ",
-                  "departure_time": "2025-01-01 08:00",
-                  "arrival_time": "2025-01-01 10:00",
-                  "price": 500.0,
-                  "availability": true
-                }
-              ]
+              "flight_info": {
+                "flight_number": "example_number",
+                "departure_time": "example_time",
+                "arrival_time": "example_time",
+                "price": 100.0,
+                "availability": true
+              }
             }
           },
           "endpoints": [
@@ -39,7 +35,7 @@
               "path": "Not applicable (local function)",
               "method": "Not applicable (local function)",
               "description": "The get_flights function is used to retrieve flight data based on the provided parameters.",
-              "summary": "Retrieve flight data using various parameters."
+              "summary": "Retrieve flight data from Google Flights"
             }
           ]
         },
@@ -49,7 +45,7 @@
           "llm_provider": "perplexity",
           "llm_enhanced": true
         },
-        "generated_at": "2025-05-28T01:47:50.786796",
+        "generated_at": "2025-05-29T01:35:58.044798",
         "files": {
           "tool": "tool.py",
           "wrapper": "wrapper.py",
@@ -156,15 +152,722 @@
           "documentation_length": 1771
         }
       }
+    },
+    "FastFlightsToolV2": {
+      "directory": "fastflightstoolv2",
+      "metadata": {
+        "name": "FastFlightsToolV2",
+        "description": "A Python package for scraping Google Flights data using Base64-encoded Protobuf strings.",
+        "version": "1.0.0",
+        "api_info": {
+          "api_name": "Fast Flights",
+          "base_url": null,
+          "authentication": {
+            "type": "none",
+            "description": "No authentication required."
+          },
+          "response_format": {
+            "type": "object",
+            "class_name": "Result",
+            "structure": {
+              "flight_information": {
+                "type": "list",
+                "description": "List of flight information objects.",
+                "item_structure": {
+                  "flight_id": "string - Unique flight ID",
+                  "departure": "string - Departure details",
+                  "arrival": "string - Arrival details",
+                  "price": "number - Flight price",
+                  "availability": "boolean - Availability status"
+                }
+              },
+              "prices": {
+                "type": "list",
+                "description": "List of price objects.",
+                "item_structure": {
+                  "price": "number - Price value",
+                  "currency": "string - Currency code"
+                }
+              },
+              "availability": {
+                "type": "boolean",
+                "description": "Availability status of the flights."
+              }
+            },
+            "example": {
+              "flight_information": [
+                {
+                  "flight_id": "FL123",
+                  "departure": "2025-01-01 08:00",
+                  "arrival": "2025-01-01 10:00",
+                  "price": 500.0,
+                  "availability": true
+                }
+              ],
+              "prices": [
+                {
+                  "price": 500.0,
+                  "currency": "USD"
+                }
+              ],
+              "availability": true
+            }
+          },
+          "endpoints": []
+        },
+        "parsing_info": {
+          "method": "llm",
+          "confidence_score": 0.95,
+          "llm_provider": "perplexity",
+          "llm_enhanced": true
+        },
+        "generated_at": "2025-05-29T01:46:52.008096",
+        "files": {
+          "tool": "tool.py",
+          "wrapper": "wrapper.py",
+          "metadata": "metadata.json"
+        },
+        "mcp_schema": {
+          "input_schema": {
+            "flight_data": {
+              "type": "array",
+              "description": "A list of FlightData objects containing flight details.",
+              "required": true,
+              "class_structure": {
+                "date": "string - Flight date in YYYY-MM-DD format (e.g., '2025-01-01')",
+                "from_airport": "string - 3-letter departure airport code (e.g., 'TPE')",
+                "to_airport": "string - 3-letter arrival airport code (e.g., 'MYJ')"
+              },
+              "example": "[FlightData(date='2025-01-01', from_airport='TPE', to_airport='MYJ')]"
+            },
+            "trip": {
+              "type": "string",
+              "description": "Type of trip.",
+              "required": true,
+              "enum": [
+                "one-way",
+                "round-trip"
+              ],
+              "example": "one-way"
+            },
+            "seat": {
+              "type": "string",
+              "description": "Seat class.",
+              "required": true,
+              "enum": [
+                "economy",
+                "premium-economy",
+                "business",
+                "first"
+              ],
+              "example": "economy"
+            },
+            "passengers": {
+              "type": "object",
+              "description": "Passengers object containing details about the passengers.",
+              "required": true,
+              "class_structure": {
+                "adults": "integer - Number of adult passengers",
+                "children": "integer - Number of child passengers",
+                "infants_in_seat": "integer - Number of infants with seats",
+                "infants_on_lap": "integer - Number of lap infants"
+              },
+              "example": "Passengers(adults=2, children=1, infants_in_seat=0, infants_on_lap=0)"
+            },
+            "fetch_mode": {
+              "type": "string",
+              "description": "Data fetching method.",
+              "required": false,
+              "enum": [
+                "common",
+                "fallback",
+                "force-fallback"
+              ],
+              "default": "common",
+              "example": "fallback"
+            }
+          },
+          "output_schema": {
+            "type": "object",
+            "properties": {
+              "flights": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "field_mapping": {
+            "flights": "flights"
+          }
+        },
+        "input_sources": {
+          "api_documentation_provided": true,
+          "documentation_length": 1771
+        }
+      }
+    },
+    "FastFlightsOriginal": {
+      "directory": "fastflightsoriginal",
+      "metadata": {
+        "name": "FastFlightsOriginal",
+        "description": "A Python package for scraping Google Flights data using Base64-encoded Protobuf strings.",
+        "version": "1.0.0",
+        "api_info": {
+          "api_name": "Fast Flights",
+          "base_url": null,
+          "authentication": {
+            "type": "none",
+            "description": "No authentication required."
+          },
+          "response_format": {
+            "type": "object",
+            "class_name": "Result",
+            "structure": {
+              "flight_information": {
+                "type": "object",
+                "description": "Contains detailed flight information."
+              },
+              "prices": {
+                "type": "object",
+                "description": "Contains price details for the flights."
+              },
+              "availability": {
+                "type": "object",
+                "description": "Contains availability details for the flights."
+              }
+            },
+            "example": {
+              "flight_information": {
+                "flight_number": "sample",
+                "departure_time": "sample",
+                "arrival_time": "sample"
+              },
+              "prices": {
+                "adult_price": "sample",
+                "child_price": "sample"
+              },
+              "availability": {
+                "seats_available": "sample"
+              }
+            }
+          },
+          "endpoints": []
+        },
+        "parsing_info": {
+          "method": "llm",
+          "confidence_score": 0.95,
+          "llm_provider": "perplexity",
+          "llm_enhanced": true
+        },
+        "generated_at": "2025-05-29T01:54:37.474347",
+        "files": {
+          "tool": "tool.py",
+          "wrapper": "wrapper.py",
+          "metadata": "metadata.json"
+        },
+        "mcp_schema": {
+          "input_schema": {
+            "flight_data": {
+              "type": "array",
+              "description": "A list of FlightData objects containing flight details.",
+              "required": true,
+              "class_structure": {
+                "date": "string - Flight date in YYYY-MM-DD format (e.g., '2025-01-01')",
+                "from_airport": "string - 3-letter departure airport code (e.g., 'TPE')",
+                "to_airport": "string - 3-letter arrival airport code (e.g., 'MYJ')"
+              },
+              "example": "[FlightData(date='2025-01-01', from_airport='TPE', to_airport='MYJ')]"
+            },
+            "trip": {
+              "type": "string",
+              "description": "Trip type.",
+              "required": true,
+              "enum": [
+                "one-way",
+                "round-trip"
+              ],
+              "example": "one-way"
+            },
+            "seat": {
+              "type": "string",
+              "description": "Seat class.",
+              "required": true,
+              "enum": [
+                "economy",
+                "premium-economy",
+                "business",
+                "first"
+              ],
+              "example": "economy"
+            },
+            "passengers": {
+              "type": "object",
+              "description": "Passengers object containing passenger details.",
+              "required": true,
+              "class_structure": {
+                "adults": "integer - Number of adult passengers",
+                "children": "integer - Number of child passengers",
+                "infants_in_seat": "integer - Number of infants with seats",
+                "infants_on_lap": "integer - Number of lap infants"
+              },
+              "example": "Passengers(adults=2, children=1, infants_in_seat=0, infants_on_lap=0)"
+            },
+            "fetch_mode": {
+              "type": "string",
+              "description": "Data fetching method.",
+              "required": false,
+              "enum": [
+                "common",
+                "fallback",
+                "force-fallback"
+              ],
+              "default": "common",
+              "example": "fallback"
+            }
+          },
+          "output_schema": {
+            "type": "object",
+            "properties": {
+              "flights": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "field_mapping": {
+            "flights": "flights"
+          }
+        },
+        "input_sources": {
+          "api_documentation_provided": true,
+          "documentation_length": 1771
+        }
+      }
+    },
+    "FastFlightsToolV3": {
+      "directory": "fastflightstoolv3",
+      "metadata": {
+        "name": "FastFlightsToolV3",
+        "description": "A Python package for scraping Google Flights data using Base64-encoded Protobuf strings.",
+        "version": "1.0.0",
+        "api_info": {
+          "api_name": "Fast Flights",
+          "base_url": null,
+          "authentication": {
+            "type": "none",
+            "description": "No authentication required."
+          },
+          "response_format": {
+            "type": "object",
+            "class_name": "Result",
+            "structure": {
+              "flight_information": {
+                "type": "object",
+                "description": "Contains detailed flight information."
+              },
+              "prices": {
+                "type": "object",
+                "description": "Contains price details for the flights."
+              },
+              "availability": {
+                "type": "object",
+                "description": "Contains availability details for the flights."
+              }
+            },
+            "example": {
+              "flight_information": {
+                "flight_number": "sample",
+                "departure_time": "sample",
+                "arrival_time": "sample"
+              },
+              "prices": {
+                "base_price": "sample",
+                "taxes": "sample"
+              },
+              "availability": {
+                "seats_available": "sample"
+              }
+            }
+          },
+          "endpoints": []
+        },
+        "parsing_info": {
+          "method": "llm",
+          "confidence_score": 0.95,
+          "llm_provider": "perplexity",
+          "llm_enhanced": true
+        },
+        "generated_at": "2025-05-29T02:00:48.195030",
+        "files": {
+          "tool": "tool.py",
+          "wrapper": "wrapper.py",
+          "metadata": "metadata.json"
+        },
+        "mcp_schema": {
+          "input_schema": {
+            "flight_data": {
+              "type": "array",
+              "description": "A list of FlightData objects containing flight details.",
+              "required": true,
+              "class_structure": {
+                "date": "string - Flight date in YYYY-MM-DD format",
+                "from_airport": "string - 3-letter departure airport code",
+                "to_airport": "string - 3-letter arrival airport code"
+              },
+              "example": "[FlightData(date='2025-01-01', from_airport='TPE', to_airport='MYJ')]"
+            },
+            "trip": {
+              "type": "string",
+              "description": "Type of trip.",
+              "required": true,
+              "enum": [
+                "one-way",
+                "round-trip"
+              ],
+              "example": "one-way"
+            },
+            "seat": {
+              "type": "string",
+              "description": "Seat class.",
+              "required": true,
+              "enum": [
+                "economy",
+                "premium-economy",
+                "business",
+                "first"
+              ],
+              "example": "economy"
+            },
+            "passengers": {
+              "type": "object",
+              "description": "Passengers object containing passenger details.",
+              "required": true,
+              "class_structure": {
+                "adults": "integer - Number of adult passengers",
+                "children": "integer - Number of child passengers",
+                "infants_in_seat": "integer - Number of infants with seats",
+                "infants_on_lap": "integer - Number of lap infants"
+              },
+              "example": "Passengers(adults=2, children=1, infants_in_seat=0, infants_on_lap=0)"
+            },
+            "fetch_mode": {
+              "type": "string",
+              "description": "Data fetching method.",
+              "required": false,
+              "enum": [
+                "common",
+                "fallback",
+                "force-fallback"
+              ],
+              "default": "common",
+              "example": "fallback"
+            }
+          },
+          "output_schema": {
+            "type": "object",
+            "properties": {
+              "flights": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "field_mapping": {
+            "flights": "flights"
+          }
+        },
+        "input_sources": {
+          "api_documentation_provided": true,
+          "documentation_length": 1771
+        }
+      }
+    },
+    "FastFlightsToolV4": {
+      "directory": "fastflightstoolv4",
+      "metadata": {
+        "name": "FastFlightsToolV4",
+        "description": "A Python package for scraping Google Flights data using Base64-encoded Protobuf strings.",
+        "version": "1.0.0",
+        "api_info": {
+          "api_name": "Fast Flights",
+          "base_url": null,
+          "authentication": {
+            "type": "none",
+            "description": "No authentication required."
+          },
+          "response_format": {
+            "type": "object",
+            "class_name": "Result",
+            "structure": {
+              "flight_information": {
+                "type": "object",
+                "description": "Detailed flight information."
+              },
+              "prices": {
+                "type": "object",
+                "description": "Flight prices."
+              },
+              "availability": {
+                "type": "object",
+                "description": "Flight availability."
+              }
+            },
+            "example": {
+              "flight_information": {
+                "flight_number": "sample",
+                "departure_time": "sample",
+                "arrival_time": "sample"
+              },
+              "prices": {
+                "base_price": "sample",
+                "taxes": "sample"
+              },
+              "availability": {
+                "seats_available": "sample"
+              }
+            }
+          },
+          "endpoints": []
+        },
+        "parsing_info": {
+          "method": "llm",
+          "confidence_score": 0.95,
+          "llm_provider": "perplexity",
+          "llm_enhanced": true
+        },
+        "generated_at": "2025-05-29T02:01:50.345865",
+        "files": {
+          "tool": "tool.py",
+          "wrapper": "wrapper.py",
+          "metadata": "metadata.json"
+        },
+        "mcp_schema": {
+          "input_schema": {
+            "flight_data": {
+              "type": "array",
+              "description": "A list of FlightData objects containing flight details.",
+              "required": true,
+              "class_structure": {
+                "date": "string - Flight date in YYYY-MM-DD format",
+                "from_airport": "string - 3-letter departure airport code",
+                "to_airport": "string - 3-letter arrival airport code"
+              },
+              "example": "[FlightData(date='2025-01-01', from_airport='TPE', to_airport='MYJ')]"
+            },
+            "trip": {
+              "type": "string",
+              "description": "Type of trip.",
+              "required": true,
+              "enum": [
+                "one-way",
+                "round-trip"
+              ],
+              "example": "one-way"
+            },
+            "seat": {
+              "type": "string",
+              "description": "Seat class.",
+              "required": true,
+              "enum": [
+                "economy",
+                "premium-economy",
+                "business",
+                "first"
+              ],
+              "example": "economy"
+            },
+            "passengers": {
+              "type": "object",
+              "description": "Passengers object containing passenger details.",
+              "required": true,
+              "class_structure": {
+                "adults": "integer - Number of adult passengers",
+                "children": "integer - Number of child passengers",
+                "infants_in_seat": "integer - Number of infants with seats",
+                "infants_on_lap": "integer - Number of lap infants"
+              },
+              "example": "Passengers(adults=2, children=1, infants_in_seat=0, infants_on_lap=0)"
+            },
+            "fetch_mode": {
+              "type": "string",
+              "description": "Data fetching method.",
+              "required": false,
+              "enum": [
+                "common",
+                "fallback",
+                "force-fallback"
+              ],
+              "default": "common",
+              "example": "fallback"
+            }
+          },
+          "output_schema": {
+            "type": "object",
+            "properties": {
+              "flights": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "field_mapping": {
+            "flights": "flights"
+          }
+        },
+        "input_sources": {
+          "api_documentation_provided": true,
+          "documentation_length": 1771
+        }
+      }
+    },
+    "FastFlightsToolV5": {
+      "directory": "fastflightstoolv5",
+      "metadata": {
+        "name": "FastFlightsToolV5",
+        "description": "A Python package for scraping Google Flights data using Base64-encoded Protobuf strings.",
+        "version": "1.0.0",
+        "api_info": {
+          "api_name": "Fast Flights",
+          "base_url": null,
+          "authentication": {
+            "type": "none",
+            "description": "No authentication required."
+          },
+          "response_format": {
+            "type": "object",
+            "class_name": "Result",
+            "structure": {
+              "flight_information": {
+                "type": "object",
+                "description": "Contains detailed flight information."
+              },
+              "prices": {
+                "type": "object",
+                "description": "Contains price details for the flights."
+              },
+              "availability": {
+                "type": "object",
+                "description": "Contains availability details for the flights."
+              }
+            },
+            "example": {
+              "flight_information": {
+                "flight_number": "sample",
+                "departure_time": "sample",
+                "arrival_time": "sample"
+              },
+              "prices": {
+                "base_price": "sample",
+                "taxes": "sample"
+              },
+              "availability": {
+                "seats_available": "sample"
+              }
+            }
+          },
+          "endpoints": []
+        },
+        "parsing_info": {
+          "method": "llm",
+          "confidence_score": 0.95,
+          "llm_provider": "perplexity",
+          "llm_enhanced": true
+        },
+        "generated_at": "2025-05-29T02:04:00.857444",
+        "files": {
+          "tool": "tool.py",
+          "wrapper": "wrapper.py",
+          "metadata": "metadata.json"
+        },
+        "mcp_schema": {
+          "input_schema": {
+            "flight_data": {
+              "type": "array",
+              "description": "A list of FlightData objects containing flight details.",
+              "required": true,
+              "class_structure": {
+                "date": "string - Flight date in YYYY-MM-DD format (e.g., '2025-01-01')",
+                "from_airport": "string - 3-letter departure airport code (e.g., 'TPE')",
+                "to_airport": "string - 3-letter arrival airport code (e.g., 'MYJ')"
+              },
+              "example": "[FlightData(date='2025-01-01', from_airport='TPE', to_airport='MYJ')]"
+            },
+            "trip": {
+              "type": "string",
+              "description": "Type of trip.",
+              "required": true,
+              "enum": [
+                "one-way",
+                "round-trip"
+              ],
+              "example": "one-way"
+            },
+            "seat": {
+              "type": "string",
+              "description": "Seat class.",
+              "required": true,
+              "enum": [
+                "economy",
+                "premium-economy",
+                "business",
+                "first"
+              ],
+              "example": "economy"
+            },
+            "passengers": {
+              "type": "object",
+              "description": "Passengers object containing details about the passengers.",
+              "required": true,
+              "class_structure": {
+                "adults": "integer - Number of adult passengers",
+                "children": "integer - Number of child passengers",
+                "infants_in_seat": "integer - Number of infants with seats",
+                "infants_on_lap": "integer - Number of lap infants"
+              },
+              "example": "Passengers(adults=2, children=1, infants_in_seat=0, infants_on_lap=0)"
+            },
+            "fetch_mode": {
+              "type": "string",
+              "description": "Data fetching method.",
+              "required": false,
+              "enum": [
+                "common",
+                "fallback",
+                "force-fallback"
+              ],
+              "default": "common",
+              "example": "fallback"
+            }
+          },
+          "output_schema": {
+            "type": "object",
+            "properties": {
+              "flights": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "field_mapping": {
+            "flights": "flights"
+          }
+        },
+        "input_sources": {
+          "api_documentation_provided": true,
+          "documentation_length": 1771
+        }
+      }
     }
   },
-  "last_updated": "2025-05-28T01:47:50.791780",
-  "version": "0.3.0",
-  "description": "Central registry for generated MCP tools",
-  "schema_version": "1.0",
-  "metadata": {
-    "total_tools": 1,
-    "creation_date": "2024-01-01T00:00:00Z",
-    "last_cleanup": "2025-05-28T01:47:50.791780"
-  }
+  "last_updated": "2025-05-29T02:04:00.866185"
 }

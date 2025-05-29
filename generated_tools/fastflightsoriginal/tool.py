@@ -1,6 +1,6 @@
 """
-Generated MCP Tool: fast_flights
-Description: An API for scraping Google Flights data using Base64-encoded Protobuf strings. It provides structured flight information, prices, and availability without requiring an API key.
+Generated MCP Tool: FastFlightsOriginal
+Description: A Python package for scraping Google Flights data using Base64-encoded Protobuf strings.
 
 Auto-generated from API usage code.
 """
@@ -8,19 +8,19 @@ import os
 import json
 import requests
 from typing import Any, Dict
-from src.mcp_tool import MCPTool
+from src.core.mcp_tool import MCPTool
 
-def call_fastflightsapi(flight_data: str, trip: str, seat: str, passengers: str, fetch_mode: str = None):
+def call_fastflights(flight_data: str, trip: str, seat: str, passengers: str, fetch_mode: str = None):
     """
-    Function to call Fast Flights API
+    Function to call Fast Flights
     Generated from LLM analysis of API documentation
     
-    Base URL: Not applicable (local Python package)
+    Base URL: None
     Authentication: none
     """
     """
     Usage examples from API documentation:
-        - {'description': 'Retrieve one-way flight data from TPE to MYJ on January 1, 2025, for two adults and one child in economy class using the fallback fetching method.', 'parameters': {'flight_data': [{'date': '2025-01-01', 'from_airport': 'TPE', 'to_airport': 'MYJ'}], 'trip': 'one-way', 'seat': 'economy', 'passengers': {'adults': 2, 'children': 1, 'infants_in_seat': 0, 'infants_on_lap': 0}, 'fetch_mode': 'fallback'}, 'expected_response': 'A Result object containing flight information, prices, and availability.'}
+        - {'description': 'Example usage for a one-way flight search.', 'parameters': {'flight_data': "[FlightData(date='2025-01-01', from_airport='TPE', to_airport='MYJ')]", 'trip': 'one-way', 'seat': 'economy', 'passengers': 'Passengers(adults=2, children=1, infants_in_seat=0, infants_on_lap=0)', 'fetch_mode': 'fallback'}, 'expected_response': 'A Result object containing flight information, prices, and availability.'}
     """
     import requests
     
@@ -33,90 +33,69 @@ def call_fastflightsapi(flight_data: str, trip: str, seat: str, passengers: str,
         "fetch_mode": fetch_mode or "fetch_mode_value"
     }
     
-    response = requests.get("Not applicable (local Python package)", params=params)
+    response = requests.get("None", params=params)
     return response.json()
 
 
-class fast_flights(MCPTool):
-    name = "fast_flights"
-    description = "An API for scraping Google Flights data using Base64-encoded Protobuf strings. It provides structured flight information, prices, and availability without requiring an API key."
+class FastFlightsOriginal(MCPTool):
+    name = "FastFlightsOriginal"
+    description = "A Python package for scraping Google Flights data using Base64-encoded Protobuf strings."
     parameters_schema = {
     "flight_data": {
         "type": "array",
         "description": "A list of FlightData objects containing flight details.",
         "required": true,
-        "default": null,
-        "enum": null,
-        "pattern": null,
-        "minimum": null,
-        "maximum": null,
-        "example": [
-            {
-                "date": "2025-01-01",
-                "from_airport": "TPE",
-                "to_airport": "MYJ"
-            }
-        ]
+        "class_structure": {
+            "date": "string - Flight date in YYYY-MM-DD format (e.g., '2025-01-01')",
+            "from_airport": "string - 3-letter departure airport code (e.g., 'TPE')",
+            "to_airport": "string - 3-letter arrival airport code (e.g., 'MYJ')"
+        },
+        "example": "[FlightData(date='2025-01-01', from_airport='TPE', to_airport='MYJ')]"
     },
     "trip": {
         "type": "string",
-        "description": "The type of trip. Can be 'one-way' or 'round-trip'.",
+        "description": "Trip type.",
         "required": true,
-        "default": null,
         "enum": [
             "one-way",
             "round-trip"
         ],
-        "pattern": null,
-        "minimum": null,
-        "maximum": null,
         "example": "one-way"
     },
     "seat": {
         "type": "string",
-        "description": "The class of seat. Can be 'economy', 'premium-economy', 'business', or 'first'.",
+        "description": "Seat class.",
         "required": true,
-        "default": null,
         "enum": [
             "economy",
             "premium-economy",
             "business",
             "first"
         ],
-        "pattern": null,
-        "minimum": null,
-        "maximum": null,
         "example": "economy"
     },
     "passengers": {
         "type": "object",
-        "description": "An object containing the number of passengers.",
+        "description": "Passengers object containing passenger details.",
         "required": true,
-        "default": null,
-        "enum": null,
-        "pattern": null,
-        "minimum": null,
-        "maximum": null,
-        "example": {
-            "adults": 2,
-            "children": 1,
-            "infants_in_seat": 0,
-            "infants_on_lap": 0
-        }
+        "class_structure": {
+            "adults": "integer - Number of adult passengers",
+            "children": "integer - Number of child passengers",
+            "infants_in_seat": "integer - Number of infants with seats",
+            "infants_on_lap": "integer - Number of lap infants"
+        },
+        "example": "Passengers(adults=2, children=1, infants_in_seat=0, infants_on_lap=0)"
     },
     "fetch_mode": {
         "type": "string",
-        "description": "The data fetching method. Can be 'common', 'fallback', or 'force-fallback'.",
+        "description": "Data fetching method.",
         "required": false,
-        "default": "common",
         "enum": [
             "common",
             "fallback",
             "force-fallback"
         ],
-        "pattern": null,
-        "minimum": null,
-        "maximum": null,
+        "default": "common",
         "example": "fallback"
     }
 }
