@@ -9,21 +9,12 @@
 ## 🚀 Quick Start
 
 ### 1. **Environment Setup**
-Set your LLM API key (required - choose one):
+Set your LLM API key (required - setup at least one key):
 ```bash
-# OpenAI (recommended)
 export OPENAI_API_KEY="your_openai_api_key"
-
-# OR Anthropic Claude
 export ANTHROPIC_API_KEY="your_anthropic_api_key"
-
-# OR Google Gemini
 export GOOGLE_API_KEY="your_google_api_key"
-
-# OR Mistral AI
 export MISTRAL_API_KEY="your_mistral_api_key"
-
-# OR Perplexity Sonar
 export PERPLEXITY_API_KEY="your_perplexity_api_key"
 ```
 
@@ -34,9 +25,7 @@ pip install -r requirements.txt
 
 ### 2. **Generate a Tool with One Command**
 ```bash
-python main.py \
-  --name WeatherTool \
-  --api-docs "OpenWeatherMap API: Get current weather data. Base URL: https://api.openweathermap.org/data/2.5/weather. Parameters: q (city name), appid (API key). Returns JSON with temperature, humidity, weather description."
+python main.py --name example_tool --api-docs examples/example_api_doc.txt
 ```
 
 ### 3. **Use Your Generated Tool**
@@ -99,26 +88,11 @@ agent = create_react_agent("openai:gpt-4", tools)
 ---
 
 ## 📖 Usage Examples
-
-### Example 1: Weather API
+### Example: From Documentation File
 ```bash
 python main.py \
-  --name WeatherTool \
-  --api-docs "OpenWeatherMap Current Weather API. Base URL: https://api.openweathermap.org/data/2.5/weather. Authentication: API key as 'appid' parameter. Parameters: q (city), units (metric/imperial). Returns JSON with temperature, humidity, weather conditions."
-```
-
-### Example 2: News API
-```bash
-python main.py \
-  --name NewsTool \
-  --api-docs "NewsAPI Everything Endpoint. URL: https://newsapi.org/v2/everything. Authentication: X-API-Key header. Parameters: q (query), sources, language, sortBy, pageSize. Returns articles array with title, description, url."
-```
-
-### Example 3: From Documentation File
-```bash
-python main.py \
-  --name GitHubTool \
-  --api-docs examples/github_api_docs.txt
+  --name example_tool \
+  --api-docs examples/example_api_doc.txt
 ```
 
 ---
@@ -172,8 +146,6 @@ This project generates tools that are **fully compatible** with [LangChain's off
 
    asyncio.run(main())
    ```
-
-📚 **Full Documentation**: See [`LANGCHAIN_MCP_INTEGRATION.md`](LANGCHAIN_MCP_INTEGRATION.md) for comprehensive examples, multi-server setup, FastMCP integration, and troubleshooting.
 
 ---
 
